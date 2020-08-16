@@ -36,18 +36,17 @@ userSchema.methods.removeFromBasket = function (id) {
     return c.courseId.toString() === id.toString();
   });
   if (items[idx].count === 1) {
-    //удалить курс из корзины
+    //delete course from basket
     items.splice(idx, 1);
-    // items.count --;
   } else {
-    //уменьшить count
+    //reduce  count
     items[idx].count--;
   }
   this.basket = { items };
   return this.save();
 };
 userSchema.methods.addToBasket = function (course) {
-  const items = [...this.basket.items]; //клонируем массив
+  const items = [...this.basket.items]; //clone the array
   const idx = items.findIndex((c) => {
     return c.courseId.toString() === course._id.toString();
   });
