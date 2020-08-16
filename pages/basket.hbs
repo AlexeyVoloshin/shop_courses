@@ -1,0 +1,30 @@
+<h1>Корзина</h1>
+
+<div id="basket"> {{!-- что бы не создавать обработчик для каждой отльно--}}
+{{#if courses.length}}
+<table>
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Количество</th>
+            <th>Действие</th>
+        </tr> 
+    </thead>
+    {{#each courses}}
+    <tr>
+        <td>{{title}}</td>
+        <td>{{count}}</td>
+        <td>
+            <button class="btn btm-small js-remove" data-id="{{id}}">Удалить</button>
+        </td>
+    </tr>
+    {{/each}}
+</table>
+<p><strong>Цена: </strong><span class="price">{{price}}</span></p>
+<form action="/orders" method="POST">
+    <button class="btn" type="submit">Выполнить заказ</button>
+</form>
+{{else}}
+    <p>Корзина пуста</p>
+{{/if}}
+</div>

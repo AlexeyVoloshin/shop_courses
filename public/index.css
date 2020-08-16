@@ -1,0 +1,44 @@
+nav {
+  background-color: #2f4f4f;
+}
+.nav-wrapper {
+  padding: 0 5rem;
+}
+.card {
+  width: 400px;
+  height: auto;
+}
+.card-image {
+  position: relative;
+}
+.price {
+  font-size: 2rem;
+}
+.course {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.course h1 {
+  margin-bottom: 2rem;
+}
+.course img {
+  max-width: 200px;
+  height: auto;
+}
+.cource .price.big {
+  font-size: 2.5rem;
+}
+.card-action.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cource_form {
+  margin-bottom: 1.5rem;
+}
+
+.auth {
+  padding: 1rem;
+}
