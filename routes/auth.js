@@ -9,7 +9,7 @@ router.get("/login", (req, res) => {
   });
 });
 router.get("/logout", (req, res) => {
-  //передаем в метод destroy callBack который сработает когда данные сессии будут уничтожены
+  //we pass to the destroy method callBack which will be triggered when the session data is destroyed
   req.session.destroy(() => {
     res.redirect('/');
   });

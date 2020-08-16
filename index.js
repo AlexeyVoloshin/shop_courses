@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Handlebars = require("handlebars");
 const exphbs = require("express-handlebars");
 const session = require("express-session");
+const MongoStore = require("connect-mongodb-session")(session);
 const homeRout = require("./routes/home");
 const coursesRout = require("./routes/courses");
 const addRout = require("./routes/add");
@@ -15,37 +16,38 @@ const varMiddleware = require("./middleware/variables");
 const {
   allowInsecurePrototypeAccess,
 } = require("@handlebars/allow-prototype-access");
-const User = require("./models/user");
+// const User = require("./models/user");
+const password = "LyW3ShZ555R9bnMI";
+const MONGODB_URI = `mongodb+srv://alexey:${password}@cluster0.mfycr.mongodb.net/db_shop?retryWrites=true&w=majority`;
 
 const app = express();
 
 const hbs = exphbs.create({
   handlebars: allowInsecurePrototypeAccess(Handlebars),
-  defaultLayout: "main", //файл входа всех layouts
-  extname: "hbs", //расширение вьюшки
+  defaultLayout: "main", //file enter to layouts
+  extname: "hbs",
 });
-app.engine("hbs", hbs.engine); //регестрируем движок
-app.set("view engine", "hbs"); //используем движок
-app.set("views", "pages"); //папка где храняться вьюшки
 
-// app.use(async (req, res, next) => {
-//   try {
-//     const user = await User.findById("5f32ad872be7bd1150fc77d3");
-//     req.user = user;
-//     next();
-//   } catch (e) {
-//     console.error(e);
-//   }
-// });
 
-app.use(express.static(path.join(__dirname, "public"))); //регестрируем папку для стилей
-app.use(express.urlencoded({ extended: true })); //вместо Buffer.from()
-//подключаем сессии
+const store = new MongoStore({
+  collection: 'sessions',
+  uri: MONGODB_URI
+});
+
+app.engine("hbs", hbs.engine); //register the engine
+app.set("view engine", "hbs"); //use the engine
+app.set("views", "pages"); //folder where views are stored
+
+
+app.use(express.static(path.join(__dirname, "public"))); //register a folder for styles
+app.use(express.urlencoded({ extended: true })); //instead of Buffer.from ()
+//connect sessions
 app.use(
   session({
     secret: "some secret value",
     resave: false,
     saveUninitialized: false,
+    store: store
   })
 );
 app.use(varMiddleware);
@@ -61,22 +63,13 @@ const PORT = process.env.PORT || 3000;
 
 async function init() {
   try {
-    const password = "LyW3ShZ555R9bnMI";
-    const url = `mongodb+srv://alexey:${password}@cluster0.mfycr.mongodb.net/db_shop?retryWrites=true&w=majority`;
-    await mongoose.connect(url, {
+
+    await mongoose.connect(MONGODB_URI, {
       useFindAndModify: false,
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    const candidat = await User.findOne();
-    if (!candidat) {
-      const user = await new User({
-        email: "VoloshinAlexey@gmail.com",
-        name: "Voloshin",
-        basket: { items: [] },
-      });
-      await user.save();
-    }
+
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
