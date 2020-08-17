@@ -6,7 +6,7 @@ const router = Router();
 function basketItems(basket) {
     return basket.items.map(c => ({
         ...c.courseId._doc,
-        id: c.courseId.id, //add a new key to convert _id to id in the course model 
+        id: c.courseId.id, //add a new key to convert '_id' to 'id' in the course model 
         count: c.count
     }))
 }

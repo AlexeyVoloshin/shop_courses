@@ -26,13 +26,18 @@
             <h3>Создать аккаунт</h3>
             <form action="/auth/register" method="POST">
                 <div class="input-field">
-                    <input id="regemail" name="email" type="email" class="validate" required>
-                    <label for="regemail">Email</label>
+                    <input id="name" name="name" type="text" class="validate" required>
+                    <label for="name">Имя</label>
+                    <span class="helper-text" data-error="Введите имя"></span>
+                </div>
+                <div class="input-field">
+                    <input id="reg-email" name="email" type="email" class="validate" required>
+                    <label for="reg-email">Email</label>
                     <span class="helper-text" data-error="Введите email"></span>
                 </div>
                 <div class="input-field">
-                    <input id="regpassword" name="password" type="password" class="validate" required min="4">
-                    <label for="regpassword">Пароль</label>
+                    <input id="reg-password" name="password" type="password" class="validate" required min="4">
+                    <label for="reg-password">Пароль</label>
                     <span class="helper-text" data-error="Введите пароль"></span>
                 </div>
                 <div class="input-field">
