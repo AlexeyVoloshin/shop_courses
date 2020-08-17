@@ -12,6 +12,7 @@ const basketRout = require("./routes/basket");
 const ordersRout = require("./routes/orders");
 const authRout = require("./routes/auth");
 const varMiddleware = require("./middleware/variables");
+const userMiddleware = require("./middleware/user");
 
 const {
   allowInsecurePrototypeAccess,
@@ -51,6 +52,7 @@ app.use(
   })
 );
 app.use(varMiddleware);
+app.use(userMiddleware);
 
 app.use("/", homeRout);
 app.use("/add", addRout);
