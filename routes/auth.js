@@ -16,7 +16,6 @@ router.get('/logout', (req, res) => {
   });
 })
 router.post('/login', async (req, res) => {
-  // const user = await User.findById("5f32ad872be7bd1150fc77d3");
   try {
     const { email, password } = req.body;
     const candidate = await User.findOne({ email });
