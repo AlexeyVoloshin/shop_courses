@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
+const conf = require("./conf");
 const csrf = require("csurf");
+const flash = require("connect-flash");
 const mongoose = require("mongoose");
 const Handlebars = require("handlebars");
 const exphbs = require("express-handlebars");
@@ -18,9 +20,6 @@ const userMiddleware = require("./middleware/user");
 const {
   allowInsecurePrototypeAccess,
 } = require("@handlebars/allow-prototype-access");
-// const User = require("./models/user");
-const password = "LyW3ShZ555R9bnMI";
-const MONGODB_URI = `mongodb+srv://alexey:${password}@cluster0.mfycr.mongodb.net/db_shop?retryWrites=true&w=majority`;
 
 const app = express();
 
@@ -33,7 +32,7 @@ const hbs = exphbs.create({
 
 const store = new MongoStore({
   collection: 'sessions',
-  uri: MONGODB_URI
+  uri: conf.MONGODB_URI
 });
 
 app.engine("hbs", hbs.engine); //register the engine
@@ -46,13 +45,14 @@ app.use(express.urlencoded({ extended: true })); //instead of Buffer.from ()
 //connect sessions
 app.use(
   session({
-    secret: "some secret value",
+    secret: conf.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: store
   })
 );
 app.use(csrf());
+app.use(flash());
 app.use(varMiddleware);
 app.use(userMiddleware);
 
@@ -63,19 +63,19 @@ app.use("/basket", basketRout);
 app.use("/orders", ordersRout);
 app.use("/auth", authRout);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || conf.SERV_PORT;
 
 async function init() {
   try {
 
-    await mongoose.connect(MONGODB_URI, {
+    await mongoose.connect(conf.MONGODB_URI, {
       useFindAndModify: false,
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server is running on host ${conf.BASE_URL}`);
     });
   } catch (e) {
     console.error(e);
