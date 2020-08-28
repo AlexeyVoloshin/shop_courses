@@ -130,7 +130,7 @@ router.get('/password/:token', async (req, res) => {
       return res.redirect('/auth/login')
     } else {
       res.render('auth/password', {
-        title: 'Востановить доступ',
+        title: 'Restore access',
         error: req.flash('error'),
         userId: user._id.toString(),
         token: req.params.token

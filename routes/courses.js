@@ -4,13 +4,25 @@ const auth = require('../middleware/auth');
 
 const router = Router();
 
+function isOwner(course, req) {
+    return course.userId.toString() === req.user._id.toString()
+}
 router.get('/', async (req, res) => {
-    const courses = await Course.find();
-    res.render('courses', {
-        title: 'Courses',
-        isCourses: true,
-        courses
-    })
+    try {
+        const courses = await Course.find()
+            .populate('userId', 'email name')
+            .select('price title img')
+
+        res.render('courses', {
+            title: 'Courses',
+            isCourses: true,
+            userId: req.user ? req.user._id.toString() : null,
+            courses
+        })
+    } catch (e) {
+        console.error(e);
+    }
+
 })
 router.get('/:id', async (req, res) => {
     try {
@@ -30,6 +42,11 @@ router.get('/:id/edit', auth, async (req, res) => {
             return res.redirect('/');
         }
         const course = await Course.findById(req.params.id);
+
+        if (!isOwner(course, req)) {
+            return res.redirect('/courses');
+        }
+
         res.render('course-edit', {
             title: `Редактировать ${course.title}`,
             course
@@ -39,9 +56,15 @@ router.get('/:id/edit', auth, async (req, res) => {
 router.post('/edit', auth, async (req, res) => {
     try {
         const { id, ...data } = req.body;
+        delete req.body.id;
+        const course = await Course.findById(id);
 
-        await Course.findByIdAndUpdate(id, data);
+        if (!isOwner(course, req)) {
+            return res.redirect('/courses');
+        }
 
+        Object.assign(course, data);
+        await course.save();
         res.redirect('/courses');
     } catch (e) {
         console.error(e);
