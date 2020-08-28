@@ -32,9 +32,11 @@
             </form>
         </div>
         <div id="register" class="col s6 offset-s3">
-            {{!-- <p class="alert-error">{{errorRegister}}</p> --}}
+            {{#if errorRegister}}
+            <p class="alert-error">{{errorRegister}}</p>
+            {{/if}}
             <h3>Создать аккаунт</h3>
-            <form action="/auth/register" method="POST">
+            <form action="/auth/register" method="POST" novalidate>
                 <div class="input-field">
                     <input id="name" name="name" type="text" class="validate" required>
                     <label for="name">Имя</label>
@@ -45,7 +47,6 @@
                     <label for="reg-email">Email</label>
                     <span class="helper-text" data-error="Введите email"></span>
                 </div>
-                {{!-- <p class="alert-error">{{errorRegister}}</p> --}}
                 <div class="input-field">
                     <input id="reg-password" name="password" type="password" class="validate" required min="4">
                     <label for="reg-password">Пароль</label>
