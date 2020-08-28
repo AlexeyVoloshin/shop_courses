@@ -27,6 +27,7 @@ const hbs = exphbs.create({
   handlebars: allowInsecurePrototypeAccess(Handlebars),
   defaultLayout: "main", //file enter to layouts
   extname: "hbs",
+  helpers: require('./utils/hbs-lelpers')
 });
 
 
