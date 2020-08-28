@@ -87,22 +87,22 @@ router.post('/register', async (req, res) => {
   }
 });
 router.get('/reset', (req, res) => {
-  res.render('auth/reset',{
+  res.render('auth/reset', {
     title: 'Востановление пароля',
     error: req.flash('error')
   })
 })
 router.post('/reset', (req, res) => {
   try {
-    crypto.randomBytes(32, async (err, buffer) =>{
-      if(err) {
+    crypto.randomBytes(32, async (err, buffer) => {
+      if (err) {
         req.flash('error', 'Что-то пошло не так, повторите попытку позже');
         return res.redirect('/auth/reset');
       }
       const token = buffer.toString('hex');
-      const candidate = await User.findOne({email: req.body.email});
+      const candidate = await User.findOne({ email: req.body.email });
 
-      if(candidate) {
+      if (candidate) {
         candidate.resetToken = token;
         candidate.resetTokenExp = Date.now() + 60 * 60 * 1000;
         await candidate.save();
@@ -112,10 +112,57 @@ router.post('/reset', (req, res) => {
         req.flash('error', 'Такого email нет!');
         res.redirect('/auth/reset');
       }
-    })
+    });
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
 })
+router.get('/password/:token', async (req, res) => {
+  if (!req.params.token) {
+    return res.redirect('/auth/login');
+  }
+  try {
+    const user = await User.findOne({
+      resetToken: req.params.token,
+      resetTokenExp: { $gt: Date.now() }
+    });
+    if (!user) {
+      return res.redirect('/auth/login')
+    } else {
+      res.render('auth/password', {
+        title: 'Востановить доступ',
+        error: req.flash('error'),
+        userId: user._id.toString(),
+        token: req.params.token
+      });
+    }
 
+  } catch (e) {
+    console.error(e);
+  }
+
+
+})
+router.post('/password', async (req, res) => {
+  try {
+    const { password, userId, token } = req.body;
+    const user = await User.findOne({
+      _id: userId,
+      resetToken: token,
+      resetTokenExp: { $gt: Date.now() } //must be greater than the current date
+    })
+    if (user) {
+      user.password = await bcrypt.hash(password, 10);
+      user.resetToken = undefined;
+      user.resetTokenExp = undefined;
+      await user.save()
+      res.redirect('/auth/login');
+    } else {
+      req.flash('loginError', 'Время востановления пароля истекло');
+      res.redirect('/auth/login');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+})
 module.exports = router;
