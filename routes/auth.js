@@ -1,14 +1,14 @@
 const { Router } = require("express");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const nodemailer = require('nodemailer');
 const sendgrid = require('nodemailer-sendgrid-transport');
 const User = require("../models/user");
 const conf = require("../conf");
 const regEmail = require("../emails/registration");
 const resEmail = require("../emails/reset");
-const crypto = require("crypto");
 const { validationResult } = require('express-validator');
-const validators = require("../utils/validators")
+const { loginValidators, registerValidators } = require("../utils/validators")
 
 const router = Router();
 
@@ -25,40 +25,41 @@ router.get('/login', (req, res) => {
     success: req.flash('success')
   });
 });
+
 router.get('/logout', (req, res) => {
   //we pass to the destroy method callBack which will be triggered when the session data is destroyed
   req.session.destroy(() => {
     res.redirect('/');
   });
-})
-router.post('/login', async (req, res) => {
+});
+
+router.post('/login', loginValidators, async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const candidate = await User.findOne({ email });
-    if (candidate) {
-      const pass = await bcrypt.compare(password, candidate.password)
-      if (pass) {
-        req.session.user = candidate;
-        req.session.isAuthenticated = true;
-        req.session.save((err) => {
-          if (err) {
-            throw err;
-          } else {
-            res.redirect('/courses');
-          }
-        })
-      } else {
-        req.flash('errorLogin', 'Не верный пароль или email!');
-        res.redirect('/auth/login#login');
-      }
-    } else {
-      res.redirect('/auth/login#login');
+    const { email } = req.body;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.flash('errorLogin', errors.array()[0].msg);
+      return res.status(422).redirect('/auth/login#login');
     }
+
+    const candidate = await User.findOne({ email });
+
+    req.session.user = candidate;
+    req.session.isAuthenticated = true;
+    req.session.save((err) => {
+      if (err) {
+        throw err;
+      } else {
+        res.redirect('/courses');
+      }
+    })
   } catch (e) {
     console.error(e);
   }
 });
-router.post('/register', validators.registerValidators, async (req, res) => {
+
+router.post('/register', registerValidators, async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -66,7 +67,7 @@ router.post('/register', validators.registerValidators, async (req, res) => {
 
     if (!errors.isEmpty()) {
       req.flash('errorRegister', errors.array()[0].msg);
-      return res.status(422).redirect('/auth/login#register');
+      return res.status(422).redirect(`/auth/login#register`)
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -84,12 +85,14 @@ router.post('/register', validators.registerValidators, async (req, res) => {
     console.error(e);
   }
 });
+
 router.get('/reset', (req, res) => {
   res.render('auth/reset', {
     title: 'Востановление пароля',
     error: req.flash('error')
   })
-})
+});
+
 router.post('/reset', (req, res) => {
   try {
     crypto.randomBytes(32, async (err, buffer) => {
@@ -114,7 +117,8 @@ router.post('/reset', (req, res) => {
   } catch (e) {
     console.error(e);
   }
-})
+});
+
 router.get('/password/:token', async (req, res) => {
   if (!req.params.token) {
     return res.redirect('/auth/login');
@@ -140,7 +144,8 @@ router.get('/password/:token', async (req, res) => {
   }
 
 
-})
+});
+
 router.post('/password', async (req, res) => {
   try {
     const { password, userId, token } = req.body;
@@ -162,5 +167,6 @@ router.post('/password', async (req, res) => {
   } catch (e) {
     console.error(e);
   }
-})
+});
+
 module.exports = router;

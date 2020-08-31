@@ -14,8 +14,11 @@ const addRout = require("./routes/add");
 const basketRout = require("./routes/basket");
 const ordersRout = require("./routes/orders");
 const authRout = require("./routes/auth");
+const profileRout = require("./routes/profile");
+const fileMiddleware = require("./middleware/file");
 const varMiddleware = require("./middleware/variables");
 const userMiddleware = require("./middleware/user");
+const errorHandler = require("./middleware/error");
 
 const {
   allowInsecurePrototypeAccess,
@@ -42,6 +45,7 @@ app.set("views", "pages"); //folder where views are stored
 
 
 app.use(express.static(path.join(__dirname, "public"))); //register a folder for styles
+app.use('/uploads', express.static(path.join(__dirname, "uploads")));
 app.use(express.urlencoded({ extended: true })); //instead of Buffer.from ()
 //connect sessions
 app.use(
@@ -52,6 +56,7 @@ app.use(
     store: store
   })
 );
+app.use(fileMiddleware.single('avatar')); //before all other middleware
 app.use(csrf());
 app.use(flash());
 app.use(varMiddleware);
@@ -63,6 +68,9 @@ app.use("/courses", coursesRout);
 app.use("/basket", basketRout);
 app.use("/orders", ordersRout);
 app.use("/auth", authRout);
+app.use("/profile", profileRout);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || conf.SERV_PORT;
 

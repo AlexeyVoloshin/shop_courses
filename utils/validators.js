@@ -1,7 +1,9 @@
 const { body } = require('express-validator');
 const User = require("../models/user");
+const bcrypt = require("bcryptjs");
 
-exports.registerValidators = [
+
+registerValidators = [
     body('email').isEmail().withMessage('Введите коректный email')
         .custom(async (value, { req }) => {
             try {
@@ -28,3 +30,42 @@ exports.registerValidators = [
         .trim()
 ];
 
+loginValidators = [
+    body('email').isEmail().withMessage('Введите коректный email')
+        .custom(async (value, { req }) => {
+            // console.log(req.body)
+            try {
+                const user = await User.findOne({ email: value });
+                if (!user) {
+                    return Promise.reject('Пользователь с таким emeil не найден')
+                }
+
+            } catch (e) {
+                console.error(e)
+            }
+        }).normalizeEmail(),
+    body('password', 'Пароль должен быть минимум 6 символов')
+        .custom(async (value, { req }) => {
+            try {
+                const user = await User.findOne({ email: req.body.email });
+                const pass = await bcrypt.compare(value, user.password);
+                if (!pass) {
+                    return Promise.reject('Не верный пароль!')
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        })
+        .isAlphanumeric().trim(),
+]
+courseValidators = [
+    body('title').isLength({ min: 4 }).withMessage('Имя должно быть минимум 4 символа!'),
+    body('price').isNumeric().withMessage('Введите стоимость курса').trim(),
+    body('img', 'Введите коректный url картинки').isURL()
+]
+
+module.exports = {
+    registerValidators,
+    loginValidators,
+    courseValidators
+}
