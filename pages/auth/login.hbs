@@ -36,14 +36,14 @@
             <p class="alert-error">{{errorRegister}}</p>
             {{/if}}
             <h3>Создать аккаунт</h3>
-            <form action="/auth/register" method="POST">
+            <form action="/auth/register" method="POST" novalidate>
                 <div class="input-field">
-                    <input id="name" name="name" type="text" class="validate" required>
+                    <input id="name" name="name" type="text" class="validate" value="{{data.name}}" required>
                     <label for="name">Имя</label>
                     <span class="helper-text" data-error="Введите имя"></span>
                 </div>
                 <div class="input-field">
-                    <input id="reg-email" name="email" type="email" class="validate" required>
+                    <input id="reg-email" name="email" type="email" class="validate" value="{{data.email}}" required>
                     <label for="reg-email">Email</label>
                     <span class="helper-text" data-error="Введите email"></span>
                 </div>
@@ -54,7 +54,7 @@
                 </div>
                 <div class="input-field">
                     <input id="confirm" name="confirm" type="password" class="validate" required min="4">
-                    <label for="confirm">Пароль еще раз</label>
+                    <label for="confirm">Повторите пароль</label>
                     <span class="helper-text" data-error="Введите пароль"></span>
                 </div>
 

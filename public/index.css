@@ -59,3 +59,7 @@ nav {
   visibility: hidden;
   transition: opacity 1s visibility 0s 1s;
 }
+.avatar {
+  max-width: 200px;
+  height: auto;
+}
