@@ -21,11 +21,8 @@ const courseSchema = new Schema({
 })
 courseSchema.method('toClient', function() {
     const course = this.toObject();
-    console.log('Schema1', course)
-
     course.id = course._id;
     delete course._id;
-console.log('Schema2', course)
     return course
 })
 module.exports = model('Course', courseSchema)

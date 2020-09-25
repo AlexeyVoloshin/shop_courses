@@ -4,6 +4,8 @@ const conf = require("./conf");
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const mongoose = require("mongoose");
+const helmet = require('helmet');
+const compression = require('compression');
 const Handlebars = require("handlebars");
 const exphbs = require("express-handlebars");
 const session = require("express-session");
@@ -59,6 +61,19 @@ app.use(
 app.use(fileMiddleware.single('avatar')); //before all other middleware
 app.use(csrf());
 app.use(flash());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": ["'self'", "cdnjs.cloudflare.com"],
+      "object-src": ["'none'"],
+      "style-src": ["'self'", "cdnjs.cloudflare.com"],
+      "img-src": ["'self'","https:"]
+    },
+  }
+}));
+
+app.use(compression());
 app.use(varMiddleware);
 app.use(userMiddleware);
 
@@ -72,7 +87,7 @@ app.use("/profile", profileRout);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || conf.SERV_PORT;
+const PORT = process.env.PORT || 3000;
 
 async function init() {
   try {
