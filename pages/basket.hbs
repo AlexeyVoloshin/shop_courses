@@ -1,6 +1,6 @@
 <h3>Корзина</h3>
 
-<div id="basket"> {{!-- что бы не создавать обработчик для каждой отльно--}}
+<div id="basket"> {{!-- чтобы не создавать обработчик для каждой кнопки отдельно--}}
     {{#if courses.length}}
     <table>
         <thead>
@@ -15,7 +15,9 @@
             <td>{{title}}</td>
             <td>{{count}}</td>
             <td>
-                <button class="btn btm-small js-remove" data-id="{{id}}" data-csrf="{{@root.csrf}}">Удалить</button>
+                <button class="btn btm-small js-remove" data-id="{{id}}" data-csrf="{{@root.csrf}}">
+                    Удалить
+                </button>
             </td>
         </tr>
         {{/each}}
